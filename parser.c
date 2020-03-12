@@ -102,15 +102,30 @@ int parse_string(const char* buff, unsigned long size) {
 
         for (int token; (token = scan(&lexer, buff_end)); ) {
             // Send strings to the parser with NAME tokens
-            if (token == NAME) {
-                int name_length;
-                char name_str[64];
-                name_length = lexer.cur - lexer.top;
-                strncpy(name_str, lexer.top, name_length);
-                name_str[name_length] = '\0';
-                Parse(parser, token, name_str, &ast);
-            } else {
-                Parse(parser, token, "", &ast);
+            char* val = 0;
+            int len = 0;
+            switch (token) {
+                case NAME:
+                case INT_LITERAL:
+                    // TODO we are leaking memory here
+                    len = lexer.cur - lexer.top;
+                    val = malloc(len+1);
+                    memcpy(val, lexer.top, len);
+                    val[len] = '\0';
+                    Parse(parser, token, val, &ast);
+                    break;
+                case STRING_LITERAL_SINGLE:
+                case STRING_LITERAL_DOUBLE:
+                    // TODO we are leaking memory here
+                    len = lexer.cur - lexer.top - 2;
+                    val = malloc(len+1);
+                    memcpy(val, lexer.top + 1, len);
+                    val[len] = '\0';
+                    Parse(parser, token, val, &ast);
+                    break;
+                default:
+                    Parse(parser, token, "", &ast);
+                    break;
             }
 
             // Execute Parse for the last time

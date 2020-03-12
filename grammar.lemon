@@ -24,10 +24,11 @@ unary_operator ::= LNOT.
 assignment_operator ::= EQ.
 
 // PRIMARY EXPRESSION
-primary_expression ::= NAME.
-primary_expression ::= INT_LITERAL.
-primary_expression ::= STRING_LITERAL.
-primary_expression ::= LPAREN expression RPAREN.
+primary_expression ::= NAME(E). { fprintf(stderr, "NAME [%s]\n", E); }
+primary_expression ::= INT_LITERAL(E). { fprintf(stderr, "INT [%s]\n", E); }
+primary_expression ::= STRING_LITERAL_SINGLE(E). { fprintf(stderr, "STRING_S [%s]\n", E); }
+primary_expression ::= STRING_LITERAL_DOUBLE(E). { fprintf(stderr, "STRING_D [%s]\n", E); }
+primary_expression ::= LPAREN expression(E) RPAREN. { fprintf(stderr, "PARENTHESIZED [%s]\n", E); }
 
 // POSTFIX EXPRESSION
 postfix_expression ::= primary_expression.
@@ -99,7 +100,7 @@ conditional_expression ::=	logical_or_expression QUESTION expression COLON condi
 
 // ASSIGNMENT EXPRESSION
 assignment_expression ::= conditional_expression.
-assignment_expression ::= unary_expression assignment_operator assignment_expression.
+assignment_expression ::= unary_expression assignment_operator assignment_expression.  { fprintf(stderr, "Assignment\n"); }
 
 // EXPRESSION
 expression ::= assignment_expression.

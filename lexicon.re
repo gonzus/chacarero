@@ -65,8 +65,8 @@ regular:
     "++"                { return ADDADD; }
     "--"                { return SUBSUB; }
 
-    ["]([^"\x00]+)["]   { return STRING_LITERAL; }
-    [']([^'\x00]+)[']   { return STRING_LITERAL; }
+    ["]([^"\x00]+)["]   { return STRING_LITERAL_DOUBLE; }
+    [']([^'\x00]+)[']   { return STRING_LITERAL_SINGLE; }
     let (let|dig)*      { return NAME; }
     whitespace          { goto regular; }
 
