@@ -14,7 +14,7 @@ typedef void (FreeFunc)(void* pointer);
 
 void *ParseAlloc(MallocFunc malloc_func);
 void ParseFree(void* lemon, FreeFunc free_func);
-void Parse(void *lemon, int token, char* value, AST *ast);
+void Parse(void *lemon, int token, Value* value, AST *ast);
 void ParseTrace(FILE *fp, char *prompt);
 
 int parse_file(const char* file_name) {
@@ -100,33 +100,10 @@ int parse_string(const char* buff, unsigned long size) {
         }
         ParseTrace(traceFile, "parser >> ");
 
-        for (int token; (token = scan(&lexer)); ) {
-            // Send strings to the parser with NAME tokens
-            char* val = 0;
-            int len = 0;
-            switch (token) {
-                case NAME:
-                case INT_LITERAL:
-                    // TODO we are leaking memory here
-                    len = lexer.cur - lexer.top;
-                    val = malloc(len+1);
-                    memcpy(val, lexer.top, len);
-                    val[len] = '\0';
-                    Parse(parser, token, val, &ast);
-                    break;
-                case STRING_LITERAL_SINGLE:
-                case STRING_LITERAL_DOUBLE:
-                    // TODO we are leaking memory here
-                    len = lexer.cur - lexer.top - 2;
-                    val = malloc(len+1);
-                    memcpy(val, lexer.top + 1, len);
-                    val[len] = '\0';
-                    Parse(parser, token, val, &ast);
-                    break;
-                default:
-                    Parse(parser, token, "", &ast);
-                    break;
-            }
+        while (1) {
+            int token = scan(&lexer);
+            Value* value = value_make(&lexer, token);
+            Parse(parser, token, value, &ast);
 
             // Execute Parse for the last time
             if (token == END_TOKEN) {

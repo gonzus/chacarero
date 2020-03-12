@@ -1,8 +1,13 @@
 %include {
+#include "lexer.h"
 #include "parser.h"
 }
 
-%token_type { char* }
+%token_type { Value* }
+
+// We disable this for now, the destructor is being called too early
+// NOTE: MASSIVE MEMORY LEAK!
+// %default_destructor { value_destroy($$); }
 
 %extra_argument { AST *ast }
 
@@ -24,11 +29,11 @@ unary_operator ::= LNOT.
 assignment_operator ::= EQ.
 
 // PRIMARY EXPRESSION
-primary_expression ::= NAME(E). { fprintf(stderr, "NAME [%s]\n", E); }
-primary_expression ::= INT_LITERAL(E). { fprintf(stderr, "INT [%s]\n", E); }
-primary_expression ::= STRING_LITERAL_SINGLE(E). { fprintf(stderr, "STRING_S [%s]\n", E); }
-primary_expression ::= STRING_LITERAL_DOUBLE(E). { fprintf(stderr, "STRING_D [%s]\n", E); }
-primary_expression ::= LPAREN expression(E) RPAREN. { fprintf(stderr, "PARENTHESIZED [%s]\n", E); }
+primary_expression(P) ::= NAME(E). { fprintf(stderr, "NAME [%s]\n", E->vsym); P = E; }
+primary_expression(P) ::= INT_LITERAL(E). { fprintf(stderr, "INT [%d]\n", E->vint); P = E; }
+primary_expression(P) ::= STRING_LITERAL_SINGLE(E). { fprintf(stderr, "STRING_S [%s]\n", E->vstr); P = E; }
+primary_expression(P) ::= STRING_LITERAL_DOUBLE(E). { fprintf(stderr, "STRING_D [%s]\n", E->vstr); P = E; }
+primary_expression(P) ::= LPAREN expression(E) RPAREN. { P = E; }
 
 // POSTFIX EXPRESSION
 postfix_expression ::= primary_expression.

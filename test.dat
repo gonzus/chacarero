@@ -1,7 +1,7 @@
 # This is a simple test
 # for the re2c-generated lexer
 
-number = 1729;
 string_s = 'hello';
+number = 1729;
 string_d = "bye";
 paren = ( 44 );

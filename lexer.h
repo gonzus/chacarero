@@ -12,6 +12,20 @@ typedef struct Lexer {
   int line;
 } Lexer;
 
+enum ValueKind { ValueSymbol, ValueInt, ValueDouble, ValueString };
+
+typedef struct Value {
+    enum ValueKind kind;
+    union {
+        int vint;
+        double vdbl;
+        char* vstr;
+        char* vsym;
+    };
+} Value;
+
 int scan(Lexer* lexer);
+Value* value_make(Lexer* lexer, int token);
+void value_destroy(Value* value);
 
 #endif
