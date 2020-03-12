@@ -1,0 +1,8 @@
+demo
+lexicon.c
+grammar.c
+grammar.h
+grammar.out
+trace.out
+*.swp
+*.o
