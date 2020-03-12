@@ -20,7 +20,7 @@ demo: demo.o lexicon.o grammar.o parser.o
 lexicon.c: lexicon.re
 	re2c -W -o $@ $<
 
-grammar.c grammar.h: grammar.y $(LEMON_TEMPLATE)
+grammar.c grammar.h: grammar.lemon $(LEMON_TEMPLATE)
 	lemon -W -T$(LEMON_TEMPLATE) $<
 
 demo.o: demo.c parser.h
