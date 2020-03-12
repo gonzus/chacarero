@@ -8,9 +8,10 @@ typedef struct Lexer {
   const char *cur;
   const char *ptr;
   const char *pos;
+  const char *end;
   int line;
 } Lexer;
 
-int scan(Lexer* lexer, const char *buff_end);
+int scan(Lexer* lexer);
 
 #endif

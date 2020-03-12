@@ -83,6 +83,7 @@ int parse_string(const char* buff, unsigned long size) {
         lexer.top = buff;
         lexer.cur = buff;
         lexer.pos = buff;
+        lexer.end = buff + size;
         lexer.line = 1;
 
         /* Initialize the parser state structure */
@@ -90,7 +91,6 @@ int parse_string(const char* buff, unsigned long size) {
         memset(&ast, 0, sizeof(AST));
 
         /* Pointer to the end of the buffer */
-        const char *buff_end = buff + size;
 
         /* Create parser and set up tracing */
         parser = ParseAlloc(malloc);
@@ -100,7 +100,7 @@ int parse_string(const char* buff, unsigned long size) {
         }
         ParseTrace(traceFile, "parser >> ");
 
-        for (int token; (token = scan(&lexer, buff_end)); ) {
+        for (int token; (token = scan(&lexer)); ) {
             // Send strings to the parser with NAME tokens
             char* val = 0;
             int len = 0;

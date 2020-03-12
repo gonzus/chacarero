@@ -7,10 +7,10 @@
 #define   YYCURSOR    lexer->cur
 #define   YYMARKER    lexer->ptr
 
-int scan(Lexer* lexer, const char *buff_end) {
+int scan(Lexer* lexer) {
 
 regular:
-    if (lexer->cur >= buff_end) {
+    if (lexer->cur >= lexer->end) {
         return END_TOKEN;
     }
     lexer->top = lexer->cur;
@@ -93,7 +93,11 @@ regular:
     comment:
 /*!re2c
 
-    "\r\n"|"\n"         { lexer->line++; goto regular; }
+    "\r\n"|"\n" {
+        lexer->pos = lexer->cur;
+        lexer->line++;
+        goto regular;
+    }
     any                 { goto comment; }
 */
 }
