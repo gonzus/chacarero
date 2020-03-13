@@ -74,13 +74,17 @@ regular:
     "++"                { return ADDADD; }
     "--"                { return SUBSUB; }
 
-    ["]([^"\x00]+)["]   { return STRING_LITERAL_DOUBLE; }
-    [']([^'\x00]+)[']   { return STRING_LITERAL_SINGLE; }
+    ["]([^"\x00]+)["]   { return LIT_STD; }
+    [']([^'\x00]+)[']   { return LIT_STS; }
     let (let|dig)*      { return NAME; }
     whitespace          { goto regular; }
 
     ("0" [xX] hex+) | ("0" dig+) | (dig+) {
-        return INT_LITERAL;
+        return LIT_INT;
+    }
+
+    (dig+ ".") | ("." dig+) | (dig+ "." dig+) {
+        return LIT_DBL;
     }
 
     "\r\n"|"\n" {

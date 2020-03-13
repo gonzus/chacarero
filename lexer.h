@@ -18,7 +18,7 @@ enum ValueKind { ValueSymbol, ValueInt, ValueDouble, ValueString };
 typedef struct Value {
     enum ValueKind kind;
     union {
-        int vint;
+        long vlng;
         double vdbl;
         char* vstr;
         char* vsym;

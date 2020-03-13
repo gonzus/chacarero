@@ -4,28 +4,53 @@
 #include "grammar.h"
 #include "lexer.h"
 
+#define ACCUM(v, p) v = ((v) * 10 + *(p) - '0')
+
 Value* value_make(Lexer* lexer, int token) {
     Value* value = 0;
     int rc = 0;
     int len = lexer->cur - lexer->top;
     switch (token) {
-        case INT_LITERAL:
+        case LIT_INT:
             GMEM_NEW(value, Value*, sizeof(Value));
             value->kind = ValueInt;
-            value->vint = 0;
+            value->vlng = 0;
             for (int j = 0; j < len; ++j) {
                 const char* p = lexer->top + j;
-                value->vint = value->vint * 10 + *p - '0';
+                ACCUM(value->vlng, p);
             }
             break;
+        case LIT_DBL: {
+            GMEM_NEW(value, Value*, sizeof(Value));
+            value->kind = ValueDouble;
+            value->vdbl = 0;
+            int man = 0;
+            int dec = 0;
+            int off = 1;
+            for (int j = 0; j < len; ++j) {
+                const char* p = lexer->top + j;
+                if (*p == '.') {
+                    man = 1;
+                    continue;
+                }
+                if (man) {
+                    ACCUM(dec, p);
+                    off *= 10;
+                } else {
+                    ACCUM(value->vdbl, p);
+                }
+            }
+            value->vdbl += (double) dec / (double) off;
+            break;
+        }
         case NAME:
             GMEM_NEW(value, Value*, sizeof(Value));
             value->kind = ValueSymbol;
             GMEM_NEWSTR(value->vsym, lexer->top, len, rc);
             (void) rc;
             break;
-        case STRING_LITERAL_SINGLE:
-        case STRING_LITERAL_DOUBLE:
+        case LIT_STS:
+        case LIT_STD:
             GMEM_NEW(value, Value*, sizeof(Value));
             value->kind = ValueString;
             len -= 2;

@@ -29,16 +29,17 @@ unary_operator ::= LNOT.
 // ASSIGNMENT OPERATOR
 assignment_operator ::= EQ.
 
-variable_scalar(V) ::= DOLLAR NAME(N).  { LOG_INFO("VAR$ [%s]", N->vsym); V = N; }
-variable_array(V)  ::= AT NAME(N).      { LOG_INFO("VAR@ [%s]", N->vsym); V = N; }
+variable_scalar(V) ::= DOLLAR  NAME(N). { LOG_INFO("VAR$ [%s]", N->vsym); V = N; }
+variable_array(V)  ::= AT      NAME(N). { LOG_INFO("VAR@ [%s]", N->vsym); V = N; }
 variable_hash(V)   ::= PERCENT NAME(N). { LOG_INFO("VAR% [%s]", N->vsym); V = N; }
 
 // SCALAR VALUES
 scalar_value(V) ::= variable_scalar(S). { V = S; }
-scalar_value(V) ::= NAME(N). { LOG_INFO("NAME [%s]", N->vsym); V = N; }
-scalar_value(V) ::= INT_LITERAL(I). { LOG_INFO("INT [%d]", I->vint); V = I; }
-scalar_value(V) ::= STRING_LITERAL_SINGLE(S). { LOG_INFO("STRS [%s]", S->vstr); V = S; }
-scalar_value(V) ::= STRING_LITERAL_DOUBLE(S). { LOG_INFO("STRD [%s]", S->vstr); V = S; }
+scalar_value(V) ::= NAME(N).    { LOG_INFO("NAME [%s]", N->vsym); V = N; }
+scalar_value(V) ::= LIT_INT(N). { LOG_INFO("INT [%ld]", N->vlng); V = N; }
+scalar_value(V) ::= LIT_DBL(N). { LOG_INFO("DBL [%f]", N->vdbl); V = N; }
+scalar_value(V) ::= LIT_STS(S). { LOG_INFO("STS [%s]", S->vstr); V = S; }
+scalar_value(V) ::= LIT_STD(S). { LOG_INFO("STD [%s]", S->vstr); V = S; }
 
 // ARRAY VALUES
 array_value(V) ::= variable_array(A). { V = A; }
