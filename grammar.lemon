@@ -28,18 +28,34 @@ unary_operator ::= LNOT.
 // ASSIGNMENT OPERATOR
 assignment_operator ::= EQ.
 
+
+scalar_value(V) ::= NAME(N). { fprintf(stderr, "NAME [%s]\n", N->vsym); V = N; }
+scalar_value(V) ::= INT_LITERAL(I). { fprintf(stderr, "INT [%d]\n", I->vint); V = I; }
+scalar_value(V) ::= STRING_LITERAL_SINGLE(S). { fprintf(stderr, "STRS [%s]\n", S->vstr); V = S; }
+scalar_value(V) ::= STRING_LITERAL_DOUBLE(S). { fprintf(stderr, "STRD [%s]\n", S->vstr); V = S; }
+
+array_value ::= LBRACKET value_only_list RBRACKET. { fprintf(stderr, "ARRAY\n"); }
+
+hash_value ::= LBRACE key_and_value_list RBRACE. { fprintf(stderr, "HASH\n"); }
+
+value ::= scalar_value.
+value ::= array_value.
+value ::= hash_value.
+
+key_and_value ::= scalar_value COLON value.
+
+value_only_list ::= value.
+value_only_list ::= value_only_list COMMA value.
+
+key_and_value_list ::= key_and_value.
+key_and_value_list ::= key_and_value_list COMMA key_and_value.
+
 // PRIMARY EXPRESSION
-primary_expression(P) ::= NAME(E). { fprintf(stderr, "NAME [%s]\n", E->vsym); P = E; }
-primary_expression(P) ::= INT_LITERAL(E). { fprintf(stderr, "INT [%d]\n", E->vint); P = E; }
-primary_expression(P) ::= STRING_LITERAL_SINGLE(E). { fprintf(stderr, "STRING_S [%s]\n", E->vstr); P = E; }
-primary_expression(P) ::= STRING_LITERAL_DOUBLE(E). { fprintf(stderr, "STRING_D [%s]\n", E->vstr); P = E; }
-primary_expression(P) ::= LPAREN expression(E) RPAREN. { P = E; }
+primary_expression ::= value.
+primary_expression ::= LPAREN expression RPAREN.
 
 // POSTFIX EXPRESSION
 postfix_expression ::= primary_expression.
-postfix_expression ::= postfix_expression LBRACKET expression RBRACKET.
-postfix_expression ::= postfix_expression LPAREN RPAREN.
-postfix_expression ::= postfix_expression DOT NAME.
 postfix_expression ::= postfix_expression ARROW NAME.
 postfix_expression ::= postfix_expression ADDADD.
 postfix_expression ::= postfix_expression SUBSUB.
@@ -126,6 +142,4 @@ program ::= statement_list END_TOKEN. { fprintf(stderr, "Constructed the program
 program ::= unused.
 
 // UNUSED TERMINALS
-unused ::= LBRACE.
-unused ::= RBRACE.
-unused ::= COMMA.
+unused ::= DOT.
