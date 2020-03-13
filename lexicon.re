@@ -7,6 +7,8 @@
 #define   YYCURSOR    lexer->cur
 #define   YYMARKER    lexer->ptr
 
+static void show_lexer_error(char c);
+
 int scan(Lexer* lexer) {
 
 regular:
@@ -26,6 +28,7 @@ regular:
 */
 
 /*!re2c
+
     "#"                 { goto comment; }
     "="                 { return EQ; }
     '('                 { return LPAREN; }
@@ -81,11 +84,7 @@ regular:
     }
 
     any {
-        if (isprint(*lexer->cur)) {
-            fprintf(stderr, "unexpected character: %c\n", *lexer->cur);
-        } else {
-            fprintf(stderr, "unexpected character code: %02x\n", (unsigned char) (unsigned long) *lexer->cur);
-        }
+        show_lexer_error(*lexer->cur);
         goto regular;
     }
 */
@@ -100,4 +99,13 @@ regular:
     }
     any                 { goto comment; }
 */
+}
+
+static void show_lexer_error(char c) {
+    unsigned int x = (unsigned int) c;
+    fprintf(stderr, "LEXER ERROR: unexpected character code 0x%02x - %3d", x, x);
+    if (isprint(c)) {
+        fprintf(stderr, " - [%c]", c);
+    }
+    fprintf(stderr, "\n");
 }
