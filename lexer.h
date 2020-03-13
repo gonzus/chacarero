@@ -3,13 +3,14 @@
 
 /* definitions needed to interface with the re2c lexer */
 
+
 typedef struct Lexer {
-  const char *top;
-  const char *cur;
-  const char *ptr;
-  const char *pos;
-  const char *end;
-  int line;
+  const char *top; // points to the start of the current token
+  const char *cur; // points to the character being examined
+  const char *ptr; // used by re2c for back-tracking
+  const char *pos; // points to the start of the line
+  const char *end; // points one past the end of input
+  int line;        // current line in input
 } Lexer;
 
 enum ValueKind { ValueSymbol, ValueInt, ValueDouble, ValueString };

@@ -3,18 +3,20 @@
 #include "grammar.h"
 #include "lexer.h"
 
-#define   YYCTYPE     char
-#define   YYCURSOR    lexer->cur
-#define   YYMARKER    lexer->ptr
+// these are required by the re2c generated code
+#define   YYCTYPE     char         // data type of each input symbol
+#define   YYCURSOR    lexer->cur   // current cursor location
+#define   YYMARKER    lexer->ptr   // used by re2c to store the position for back-tracking
+
+// this check probably should at the beginning of every lexer "mode" (regular, comment, ...)
+#define LEXER_CHECK_EOF  do { if (lexer->cur >= lexer->end) { return END_TOKEN; } } while (0)
 
 static void show_lexer_error(char c);
 
 int scan(Lexer* lexer) {
 
 regular:
-    if (lexer->cur >= lexer->end) {
-        return END_TOKEN;
-    }
+    LEXER_CHECK_EOF;
     lexer->top = lexer->cur;
 
 /*!re2c
@@ -84,12 +86,15 @@ regular:
     }
 
     any {
-        show_lexer_error(*lexer->cur);
+        show_lexer_error(*lexer->top);
         goto regular;
     }
 */
 
-    comment:
+comment:
+    LEXER_CHECK_EOF;
+    lexer->top = lexer->cur;
+
 /*!re2c
 
     "\r\n"|"\n" {

@@ -1,7 +1,14 @@
 # This is a simple test
 # for the re2c-generated lexer
 
+# this is single quoted
 string_s = 'hello';
+
 number = 1729;
+#
+# this is double quoted
 string_d = "bye";
+
 paren = ( 44 );
+# FUCK
+# FUCK
