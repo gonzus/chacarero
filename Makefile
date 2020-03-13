@@ -2,7 +2,7 @@ first: demo
 
 # all warnings except unused variables, lemon has some
 CFLAGS += -Wall -Wno-unused-variable
-CFLAGS += -DGMEM_CHECK
+CFLAGS += -DGMEM_CHECK=1
 CFLAGS += -DLOG_LEVEL=1
 
 # turn on debugger support

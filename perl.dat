@@ -1,14 +1,14 @@
 $ramanujan = 1729;
-$s = "twee";
+$dutch = "twee";
 $pi = 3.141592653;
 
-@e1 = [];
-@e3 = [1];
+@empty = [];
+@single = [1];
 
-@a = [ 0, 1, 2 ];
+@three = [ 0, 1, 2, 3 ];
 
-%h1 = { "foo" : 1, 'bar' : 2 };
-%h2 = { "bilbo" : $s, 'frodo' : @a };
-
-@a3 = [ { 'oin' : 2, "gloin" : 3 }, [ 'a', 'b', 'c' ], 5 ];
-%h3 = { "bifur" : [ 4, 5, 6 ], 'bofur' : { "fili" : 11, "kili" : 12 } };
+# %foo_bar = { "foo" : 1, 'bar' : 2 };
+%bilbo_frodo = { "bilbo" : $dutch, 'frodo' : @three };
+#
+# @oin_gloin = [ { 'oin' : 2, "gloin" : 3 }, [ 'a', 'b', 'c' ], 5 ];
+# %bifur_bofur = { "bifur" : [ 4, 5, 'six' ], 'bofur' : { "fili" : 11, "kili" : @empty } };

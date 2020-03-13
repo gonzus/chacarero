@@ -6,9 +6,10 @@
 
 %token_type { Value* }
 
-// We disable this for now, the destructor is being called too early
-// NOTE: MASSIVE MEMORY LEAK!
-// %default_destructor { value_destroy($$); }
+// If some of the rules don't have C actions associated with them, lemon might
+// end up calling the non-terminal destructor in ways that, to me, are...
+// unexpected.  Caveat emptor!
+%default_destructor { value_destroy($$); }
 
 %extra_argument { AST *ast }
 
@@ -56,13 +57,13 @@ value ::= scalar_value.
 value ::= array_value.
 value ::= hash_value.
 
-key_and_value ::= scalar_value COLON value.
+key_and_value ::= scalar_value COLON value. { LOG_INFO("GONZO: key_and_value"); }
 
-value_only_list ::= value.
-value_only_list ::= value_only_list COMMA value.
+value_only_list ::= value. { LOG_INFO("GONZO: single value"); }
+value_only_list ::= value_only_list COMMA value. { LOG_INFO("GONZO: list + value"); }
 
-key_and_value_list ::= key_and_value.
-key_and_value_list ::= key_and_value_list COMMA key_and_value.
+key_and_value_list ::= key_and_value. { LOG_INFO("GONZO: single key_and_value"); }
+key_and_value_list ::= key_and_value_list COMMA key_and_value. { LOG_INFO("GONZO: list + key_and_value"); }
 
 // PRIMARY EXPRESSION
 primary_expression ::= value.
