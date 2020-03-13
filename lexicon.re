@@ -47,6 +47,10 @@ regular:
     "?"                 { return QUESTION; }
     ":"                 { return COLON; }
 
+    "$"                 { return DOLLAR; }
+    "@"                 { return AT; }
+    "%"                 { return PERCENT; }
+
     "!"                 { return LNOT; }
     "&&"                { return LAND; }
     "||"                { return LOR; }
@@ -61,7 +65,6 @@ regular:
     "-"                 { return SUB; }
     "*"                 { return MUL; }
     "/"                 { return DIV; }
-    "%"                 { return MOD; }
 
     "~"                 { return BNOT; }
     "&"                 { return BAND; }

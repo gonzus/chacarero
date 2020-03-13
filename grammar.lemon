@@ -29,6 +29,14 @@ unary_operator ::= LNOT.
 // ASSIGNMENT OPERATOR
 assignment_operator ::= EQ.
 
+variable_scalar(V) ::= DOLLAR NAME(N).  { LOG_INFO("VAR$ [%s]", N->vsym); V = N; }
+variable_array(V)  ::= AT NAME(N).      { LOG_INFO("VAR@ [%s]", N->vsym); V = N; }
+variable_hash(V)   ::= PERCENT NAME(N). { LOG_INFO("VAR% [%s]", N->vsym); V = N; }
+
+variable_name ::= variable_scalar.
+variable_name ::= variable_array.
+variable_name ::= variable_hash.
+
 // SCALAR VALUES
 scalar_value(V) ::= NAME(N). { LOG_INFO("NAME [%s]", N->vsym); V = N; }
 scalar_value(V) ::= INT_LITERAL(I). { LOG_INFO("INT [%d]", I->vint); V = I; }
@@ -67,6 +75,7 @@ postfix_expression ::= postfix_expression ADDADD.
 postfix_expression ::= postfix_expression SUBSUB.
 
 // UNARY EXPRESSION
+unary_expression ::= variable_name.
 unary_expression ::= postfix_expression.
 unary_expression ::= ADDADD unary_expression.
 unary_expression ::= SUBSUB unary_expression.
