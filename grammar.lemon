@@ -33,21 +33,20 @@ variable_scalar(V) ::= DOLLAR NAME(N).  { LOG_INFO("VAR$ [%s]", N->vsym); V = N;
 variable_array(V)  ::= AT NAME(N).      { LOG_INFO("VAR@ [%s]", N->vsym); V = N; }
 variable_hash(V)   ::= PERCENT NAME(N). { LOG_INFO("VAR% [%s]", N->vsym); V = N; }
 
-variable_name ::= variable_scalar.
-variable_name ::= variable_array.
-variable_name ::= variable_hash.
-
 // SCALAR VALUES
+scalar_value(V) ::= variable_scalar(S). { V = S; }
 scalar_value(V) ::= NAME(N). { LOG_INFO("NAME [%s]", N->vsym); V = N; }
 scalar_value(V) ::= INT_LITERAL(I). { LOG_INFO("INT [%d]", I->vint); V = I; }
 scalar_value(V) ::= STRING_LITERAL_SINGLE(S). { LOG_INFO("STRS [%s]", S->vstr); V = S; }
 scalar_value(V) ::= STRING_LITERAL_DOUBLE(S). { LOG_INFO("STRD [%s]", S->vstr); V = S; }
 
 // ARRAY VALUES
+array_value(V) ::= variable_array(A). { V = A; }
 array_value ::= LBRACKET RBRACKET. { LOG_INFO("EMPTY ARRAY"); }
 array_value ::= LBRACKET value_only_list RBRACKET. { LOG_INFO("ARRAY"); }
 
 // HASH VALUES
+hash_value(V) ::= variable_hash(H). { V = H; }
 hash_value ::= LBRACE RBRACE. { LOG_INFO("EMPTY HASH"); }
 hash_value ::= LBRACE key_and_value_list RBRACE. { LOG_INFO("HASH"); }
 
@@ -75,7 +74,6 @@ postfix_expression ::= postfix_expression ADDADD.
 postfix_expression ::= postfix_expression SUBSUB.
 
 // UNARY EXPRESSION
-unary_expression ::= variable_name.
 unary_expression ::= postfix_expression.
 unary_expression ::= ADDADD unary_expression.
 unary_expression ::= SUBSUB unary_expression.
