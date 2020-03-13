@@ -1,5 +1,6 @@
 #include <ctype.h>
 #include <stdio.h>
+#include "log.h"
 #include "grammar.h"
 #include "lexer.h"
 
@@ -108,9 +109,10 @@ comment:
 
 static void show_lexer_error(char c) {
     unsigned int x = (unsigned int) c;
-    fprintf(stderr, "LEXER ERROR: unexpected character code 0x%02x - %3d", x, x);
+    char str[32];
+    str[0] = '\0';
     if (isprint(c)) {
-        fprintf(stderr, " - [%c]", c);
+        sprintf(str, " - %c", c);
     }
-    fprintf(stderr, "\n");
+    LOG_INFO("LEXER ERROR: unexpected character code 0x%02x - %3d%s", x, x, str);
 }

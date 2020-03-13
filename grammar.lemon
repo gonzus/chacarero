@@ -1,4 +1,5 @@
 %include {
+#include "log.h"
 #include "lexer.h"
 #include "parser.h"
 }
@@ -11,11 +12,11 @@
 
 %extra_argument { AST *ast }
 
-%parse_accept { fprintf(stderr, "The parser has completed successfully\n"); }
+%parse_accept { LOG_INFO("The parser has completed successfully"); }
 
-%syntax_error { fprintf(stderr, "Parser syntax error\n"); }
+%syntax_error { LOG_INFO("** PARSER **: syntax error"); }
 
-%parse_failure { fprintf(stderr, "Parser failure\n"); }
+%parse_failure { LOG_INFO("** PARSER **: parser failure"); }
 
 %start_symbol program
 
@@ -28,16 +29,21 @@ unary_operator ::= LNOT.
 // ASSIGNMENT OPERATOR
 assignment_operator ::= EQ.
 
+// SCALAR VALUES
+scalar_value(V) ::= NAME(N). { LOG_INFO("NAME [%s]", N->vsym); V = N; }
+scalar_value(V) ::= INT_LITERAL(I). { LOG_INFO("INT [%d]", I->vint); V = I; }
+scalar_value(V) ::= STRING_LITERAL_SINGLE(S). { LOG_INFO("STRS [%s]", S->vstr); V = S; }
+scalar_value(V) ::= STRING_LITERAL_DOUBLE(S). { LOG_INFO("STRD [%s]", S->vstr); V = S; }
 
-scalar_value(V) ::= NAME(N). { fprintf(stderr, "NAME [%s]\n", N->vsym); V = N; }
-scalar_value(V) ::= INT_LITERAL(I). { fprintf(stderr, "INT [%d]\n", I->vint); V = I; }
-scalar_value(V) ::= STRING_LITERAL_SINGLE(S). { fprintf(stderr, "STRS [%s]\n", S->vstr); V = S; }
-scalar_value(V) ::= STRING_LITERAL_DOUBLE(S). { fprintf(stderr, "STRD [%s]\n", S->vstr); V = S; }
+// ARRAY VALUES
+array_value ::= LBRACKET RBRACKET. { LOG_INFO("EMPTY ARRAY"); }
+array_value ::= LBRACKET value_only_list RBRACKET. { LOG_INFO("ARRAY"); }
 
-array_value ::= LBRACKET value_only_list RBRACKET. { fprintf(stderr, "ARRAY\n"); }
+// HASH VALUES
+hash_value ::= LBRACE RBRACE. { LOG_INFO("EMPTY HASH"); }
+hash_value ::= LBRACE key_and_value_list RBRACE. { LOG_INFO("HASH"); }
 
-hash_value ::= LBRACE key_and_value_list RBRACE. { fprintf(stderr, "HASH\n"); }
-
+// ANY VALUES
 value ::= scalar_value.
 value ::= array_value.
 value ::= hash_value.
@@ -121,7 +127,7 @@ conditional_expression ::=	logical_or_expression QUESTION expression COLON condi
 
 // ASSIGNMENT EXPRESSION
 assignment_expression ::= conditional_expression.
-assignment_expression ::= unary_expression assignment_operator assignment_expression.  { fprintf(stderr, "Assignment\n"); }
+assignment_expression ::= unary_expression assignment_operator assignment_expression.  { LOG_INFO("Assignment"); }
 
 // EXPRESSION
 expression ::= assignment_expression.
@@ -138,7 +144,7 @@ statement_list ::= statement.
 statement_list ::= statement_list statement.
 
 // PROGRAM
-program ::= statement_list END_TOKEN. { fprintf(stderr, "Constructed the program symbol\n"); }
+program ::= statement_list END_TOKEN. { LOG_INFO("Constructed the program symbol"); }
 program ::= unused.
 
 // UNUSED TERMINALS

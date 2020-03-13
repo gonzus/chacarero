@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "log.h"
 #include "grammar.h"
 #include "lexer.h"
 #include "parser.h"
@@ -26,7 +27,7 @@ int parse_file(const char* file_name) {
         /* Open input file */
         fp = fopen(file_name, "r");
         if (fp == NULL) {
-            fprintf(stderr, "Can't open test file [%s]\n", file_name);
+            LOG_WARNING("Can't open test file [%s]", file_name);
             break;
         }
 
@@ -38,14 +39,14 @@ int parse_file(const char* file_name) {
         /* Allocate buffer and read */
         buff = (char*) malloc(size);
         if (!buff) {
-            fprintf(stderr, "Cannot allocate %ld bytes\n", size);
+            LOG_WARNING("Cannot allocate %ld bytes", size);
             break;
         }
 
         /* Slurp whole file */
         unsigned long bytes = fread(buff, 1, size, fp);
         if (bytes != size) {
-            fprintf(stderr, "Error reading %ld bytes from input file [%s]\n", size, file_name);
+            LOG_WARNING("Error reading %ld bytes from input file [%s]", size, file_name);
             break;
         }
 
@@ -74,7 +75,7 @@ int parse_string(const char* buff, unsigned long size) {
         /* Open trace file */
         traceFile = fopen(TRACE_FILE, "w");
         if (traceFile == NULL) {
-            fprintf(stderr, "Can't open trace file [%s]\n", TRACE_FILE);
+            LOG_WARNING("Can't open trace file [%s]", TRACE_FILE);
             break;
         }
 
@@ -95,7 +96,7 @@ int parse_string(const char* buff, unsigned long size) {
         /* Create parser and set up tracing */
         parser = ParseAlloc(malloc);
         if (!parser) {
-            fprintf(stderr, "Cannot allocate parser\n");
+            LOG_WARNING("Cannot allocate parser");
             break;
         }
         ParseTrace(traceFile, "parser >> ");
