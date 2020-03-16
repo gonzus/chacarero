@@ -10,43 +10,45 @@ Value* value_make(Lexer* lexer, int token) {
     Value* value = 0;
     int len = lexer->cur - lexer->top;
     switch (token) {
-        case LIT_INT:
+        case LIT_INT: {
+            long v = 0;
             MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueInt;
-            value->vlng = 0;
             for (int j = 0; j < len; ++j) {
                 const char* p = lexer->top + j;
-                ACCUM(value->vlng, p);
+                ACCUM(v, p);
             }
+            value->vlng = v;
             break;
+        }
+
         case LIT_DBL: {
+            long v[2] = {0, 0};
+            long o = 1;
+            int s = 0;
             MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueDouble;
-            value->vdbl = 0;
-            int man = 0;
-            int dec = 0;
-            int off = 1;
             for (int j = 0; j < len; ++j) {
                 const char* p = lexer->top + j;
                 if (*p == '.') {
-                    man = 1;
+                    s = 1;
                     continue;
                 }
-                if (man) {
-                    ACCUM(dec, p);
-                    off *= 10;
-                } else {
-                    ACCUM(value->vdbl, p);
+                ACCUM(v[s], p);
+                if (s) {
+                    o *= 10;
                 }
             }
-            value->vdbl += (double) dec / (double) off;
+            value->vdbl = (double) v[0] + (double) v[1] / (double) o;
             break;
         }
+
         case NAME:
             MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueSymbol;
             MEM_STR_DUP(value->vsym, lexer->top, len);
             break;
+
         case LIT_STS:
         case LIT_STD:
             MEM_MALLOC(value, Value*, sizeof(Value));
