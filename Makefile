@@ -2,7 +2,7 @@ first: demo
 
 # all warnings except unused variables, lemon has some
 CFLAGS += -Wall -Wno-unused-variable
-CFLAGS += -DGMEM_CHECK=1
+CFLAGS += -DMEM_CHECK=1
 CFLAGS += -DLOG_LEVEL=1
 
 # turn on debugger support
@@ -16,7 +16,7 @@ LEMON_TEMPLATE = /usr/local/share/lemon/lempar.c
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-demo: demo.o lexicon.o grammar.o lexer.o parser.o gmem.o log.o
+demo: demo.o lexicon.o grammar.o lexer.o parser.o mem.o log.o
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^
 
 lexicon.c: lexicon.re
@@ -30,7 +30,7 @@ lexicon.o: lexicon.c grammar.h lexer.h
 grammar.o: grammar.c parser.h
 lexer.o: lexer.c grammar.h lexer.h
 parser.o: parser.c grammar.h lexer.h parser.h
-gmem.o: gmem.c gmem.h
+mem.o: mem.c mem.h
 log.o: log.c log.h
 
 clean:

@@ -1,6 +1,6 @@
 #include <stdlib.h>
 #include <string.h>
-#include "gmem.h"
+#include "mem.h"
 #include "grammar.h"
 #include "lexer.h"
 
@@ -11,7 +11,7 @@ Value* value_make(Lexer* lexer, int token) {
     int len = lexer->cur - lexer->top;
     switch (token) {
         case LIT_INT:
-            GMEM_MALLOC(value, Value*, sizeof(Value));
+            MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueInt;
             value->vlng = 0;
             for (int j = 0; j < len; ++j) {
@@ -20,7 +20,7 @@ Value* value_make(Lexer* lexer, int token) {
             }
             break;
         case LIT_DBL: {
-            GMEM_MALLOC(value, Value*, sizeof(Value));
+            MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueDouble;
             value->vdbl = 0;
             int man = 0;
@@ -43,16 +43,16 @@ Value* value_make(Lexer* lexer, int token) {
             break;
         }
         case NAME:
-            GMEM_MALLOC(value, Value*, sizeof(Value));
+            MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueSymbol;
-            GMEM_STR_DUP(value->vsym, lexer->top, len);
+            MEM_STR_DUP(value->vsym, lexer->top, len);
             break;
         case LIT_STS:
         case LIT_STD:
-            GMEM_MALLOC(value, Value*, sizeof(Value));
+            MEM_MALLOC(value, Value*, sizeof(Value));
             value->kind = ValueString;
             len -= 2;
-            GMEM_STR_DUP(value->vstr, lexer->top + 1, len);
+            MEM_STR_DUP(value->vstr, lexer->top + 1, len);
             break;
     }
     return value;
@@ -62,18 +62,18 @@ void value_destroy(Value* value) {
     if (!value) return;
     switch (value->kind) {
         case ValueInt:
-            GMEM_FREE(value, Value*, sizeof(Value));
+            MEM_FREE(value, Value*, sizeof(Value));
             break;
         case ValueDouble:
-            GMEM_FREE(value, Value*, sizeof(Value));
+            MEM_FREE(value, Value*, sizeof(Value));
             break;
         case ValueString:
-            GMEM_STR_FREE(value->vstr, 0);
-            GMEM_FREE(value, Value*, sizeof(Value));
+            MEM_STR_FREE(value->vstr, 0);
+            MEM_FREE(value, Value*, sizeof(Value));
             break;
         case ValueSymbol:
-            GMEM_STR_FREE(value->vsym, 0);
-            GMEM_FREE(value, Value*, sizeof(Value));
+            MEM_STR_FREE(value->vsym, 0);
+            MEM_FREE(value, Value*, sizeof(Value));
             break;
     }
 }
