@@ -13,7 +13,7 @@
 
 %extra_argument { AST *ast }
 
-%parse_accept { LOG_INFO("The parser has completed successfully"); }
+%parse_accept { LOG_INFO("----- The parser has completed successfully -----"); }
 
 %syntax_error { LOG_INFO("** PARSER **: syntax error"); }
 
@@ -41,16 +41,16 @@ scalar_value(V) ::= LIT_INT(N). { LOG_INFO("INT [%ld]", N->vlng); V = N; }
 scalar_value(V) ::= LIT_DBL(N). { LOG_INFO("DBL [%f]", N->vdbl); V = N; }
 scalar_value(V) ::= LIT_STS(S). { LOG_INFO("STS [%s]", S->vstr); V = S; }
 scalar_value(V) ::= LIT_STD(S). { LOG_INFO("STD [%s]", S->vstr); V = S; }
+scalar_value(V) ::= LBRACKET RBRACKET. { LOG_INFO("EMPTY ARRAY"); V = 0; }
+scalar_value(V) ::= LBRACKET value_only_list(L) RBRACKET. { LOG_INFO("ARRAY"); V = L; }
+scalar_value(V) ::= LBRACE RBRACE. { LOG_INFO("EMPTY HASH"); V = 0; }
+scalar_value(V) ::= LBRACE key_and_value_list(L) RBRACE. { LOG_INFO("HASH"); V = L; }
 
 // ARRAY VALUES
 array_value(V) ::= variable_array(A). { V = A; }
-array_value ::= LBRACKET RBRACKET. { LOG_INFO("EMPTY ARRAY"); }
-array_value ::= LBRACKET value_only_list RBRACKET. { LOG_INFO("ARRAY"); }
 
 // HASH VALUES
 hash_value(V) ::= variable_hash(H). { V = H; }
-hash_value ::= LBRACE RBRACE. { LOG_INFO("EMPTY HASH"); }
-hash_value ::= LBRACE key_and_value_list RBRACE. { LOG_INFO("HASH"); }
 
 // ANY VALUES
 value ::= scalar_value.
