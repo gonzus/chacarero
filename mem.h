@@ -62,7 +62,7 @@ void mem_fini(void);
         if (!(src)) { \
             break; \
         } \
-        int l = (len) <= 0 ? strlen(src) : (len); \
+        int l = (len) <= 0 ? (int) strlen(src) : (len); \
         _MEM_RAW_MALLOC(tgt, char*, l+1); \
         memcpy(tgt, src, l); \
         (tgt)[l] = '\0'; \
@@ -72,7 +72,7 @@ void mem_fini(void);
         if (!(str)) { \
             break; \
         } \
-        int l = (len) <= 0 ? strlen(str) : (len); \
+        int l = (len) <= 0 ? (int) strlen(str) : (len); \
         _MEM_RAW_FREE(str, char*, l+1); \
     } while (0)
 
@@ -100,7 +100,7 @@ void mem_fini(void);
         if (!(src)) { \
             break; \
         } \
-        int l = (len) <= 0 ? strlen(src) : (len); \
+        int l = (len) <= 0 ? (int) strlen(src) : (len); \
         _MEM_RAW_MALLOC(tgt, char*, l+1); \
         mem_called_alloc(__FILE__, __LINE__, tgt, l+1, 1); \
         memcpy(tgt, src, l); \
@@ -111,7 +111,7 @@ void mem_fini(void);
         if (!(str)) { \
             break; \
         } \
-        int l = (len) <= 0 ? strlen(str) : (len); \
+        int l = (len) <= 0 ? (int) strlen(str) : (len); \
         mem_called_free(__FILE__, __LINE__, str, l+1, 1); \
         _MEM_RAW_FREE(str, char*, l+1); \
     } while (0)
