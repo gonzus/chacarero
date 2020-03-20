@@ -3,10 +3,13 @@ first: demo
 # use C11
 CFLAGS += -std=c11
 
-# all warnings except unused variables, lemon has some
+# get all warnings including some extra crispy ones
 CFLAGS += -Wall -Wextra
+
+# BUT... lemon has some warnings that we cannot work around
 CFLAGS += -Wno-unused-variable
 CFLAGS += -Wno-unused-parameter
+CFLAGS += -Wno-sign-compare
 
 # check memory allocations
 CFLAGS += -DMEM_CHECK=1
