@@ -1,8 +1,17 @@
 first: demo
 
+# use C11
+CFLAGS += -std=c11
+
 # all warnings except unused variables, lemon has some
-CFLAGS += -Wall -Wno-unused-variable
+CFLAGS += -Wall -Wextra
+CFLAGS += -Wno-unused-variable
+CFLAGS += -Wno-unused-parameter
+
+# check memory allocations
 CFLAGS += -DMEM_CHECK=1
+
+# see more log messages
 CFLAGS += -DLOG_LEVEL=1
 
 # turn on debugger support
