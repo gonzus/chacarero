@@ -1,6 +1,10 @@
+#include <fcntl.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
+#include <sys/stat.h>
+#include <sys/mman.h>
 #include "log.h"
 #include "grammar.h"
 #include "lexer.h"
@@ -19,49 +23,62 @@ void Parse(void *lemon, int token, Value* value, AST *ast);
 void ParseTrace(FILE *fp, char *prompt);
 
 int parse_file(const char* file_name) {
-    FILE *fp = 0;
+    int fd = -1;
+    int size = 0;
     char *buff = 0;
     int rc = 0;
 
     do {
-        /* Open input file */
-        fp = fopen(file_name, "r");
-        if (fp == NULL) {
-            LOG_WARNING("Can't open test file [%s]", file_name);
+        fd = open(file_name, O_RDONLY);
+        if (fd < 0) {
+            LOG_WARNING("Cannot open [%s]", file_name);
             break;
         }
+        LOG_DEBUG("Opened file [%s] as descriptor %d", file_name, fd);
 
-        /* Get file size */
-        fseek(fp, 0, SEEK_END);
-        unsigned long size = ftell(fp);
-        rewind(fp);
-
-        /* Allocate buffer and read */
-        buff = (char*) malloc(size);
-        if (!buff) {
-            LOG_WARNING("Cannot allocate %ld bytes", size);
+        struct stat st;
+        int status = fstat(fd, &st);
+        if (status < 0) {
+            LOG_WARNING("Cannot stat [%s]", file_name);
             break;
         }
+        size = st.st_size;
+        LOG_DEBUG("Stated file [%s] size %d", file_name, size);
 
-        /* Slurp whole file */
-        unsigned long bytes = fread(buff, 1, size, fp);
-        if (bytes != size) {
-            LOG_WARNING("Error reading %ld bytes from input file [%s]", size, file_name);
+        buff = (char*) mmap (0, size, PROT_READ, MAP_PRIVATE, fd, 0);
+        if (buff == MAP_FAILED) {
+            LOG_WARNING("Cannot mmap [%s]", file_name);
+            buff = 0;
             break;
         }
+        LOG_DEBUG("Mapped file [%s] size %d at %p", file_name, size, buff);
+
+        // close file ASAP -- mmap doesn't mind
+        rc = close(fd);
+        if (rc < 0) {
+            LOG_WARNING("Cannot close [%s]", file_name);
+        }
+        LOG_DEBUG("Closed file [%s] as descriptor %d", file_name, fd);
+        fd = -1;
 
         rc = parse_string(buff, size);
     } while (0);
 
-    /* CLEANUPS */
-
     if (buff) {
-        free(buff);
+        int rc = munmap(buff, size);
+        if (rc < 0) {
+            LOG_WARNING("Cannot unmap [%s] from %p", file_name, buff);
+        }
+        LOG_DEBUG("Unmapped file [%s] size %d from %p", file_name, size, buff);
         buff = 0;
     }
-    if (fp) {
-        fclose(fp);
-        fp = 0;
+    if (fd >= 0) {
+        int rc = close(fd);
+        if (rc < 0) {
+            LOG_WARNING("Cannot close [%s]", file_name);
+        }
+        LOG_DEBUG("Closed file [%s] as descriptor %d", file_name, fd);
+        fd = -1;
     }
 
     return rc;
