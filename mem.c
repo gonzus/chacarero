@@ -62,6 +62,9 @@ int mem_called_alloc(const char* file,
 #if defined(MEM_CHECK) && MEM_CHECK >= 2
     fprintf(stderr, "=== MEM MAL %s %d %p %d %ld %ld ===\n",
             file, line, var, count, size, total);
+#else
+    (void) file;
+    (void) line;
 #endif
 
     mem_alloc += total;
@@ -89,6 +92,9 @@ int mem_called_free(const char* file,
 #if defined(MEM_CHECK) && MEM_CHECK >= 2
     fprintf(stderr, "=== MEM FRE %s %d %p %d %ld %ld ===\n",
             file, line, var, count, size, total);
+#else
+    (void) file;
+    (void) line;
 #endif
 
     mem_freed += total;
