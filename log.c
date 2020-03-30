@@ -11,7 +11,14 @@
 // Name of environment variable to control run-time logging.
 #define LOG_LEVEL_ENV "LOG_LEVEL"
 
-static int runtime_level = -1;
+static LogInfo log_info = { LOG_LEVEL_COMPILE_TIME, -1 };
+
+static const char* log_level_name[LOG_LEVEL_LAST] = {
+    "DEBUG",
+    "INFO",
+    "WARNING",
+    "ERROR",
+};
 
 static const char* log_level_label[LOG_LEVEL_LAST] = {
     "DBG",
@@ -20,14 +27,15 @@ static const char* log_level_label[LOG_LEVEL_LAST] = {
     "ERR",
 };
 
-static int log_get_runtime_level(int level) {
-    if (runtime_level < 0) {
+static int log_get_runtime_level(void) {
+    if (log_info.level_run_time < 0) {
         const char* str = getenv(LOG_LEVEL_ENV);
         int val = -1;
         if (str) {
-            // try with log level names
+            // try with log level name / label
             for (int j = 0; val < 0 && j < LOG_LEVEL_LAST; ++j) {
-                if (strcmp(str, log_level_label[j]) == 0) {
+                if (strcmp(str, log_level_name[j]) == 0 ||
+                    strcmp(str, log_level_label[j]) == 0) {
                     val = j;
                     break;
                 }
@@ -40,9 +48,9 @@ static int log_get_runtime_level(int level) {
                 }
             }
         }
-        runtime_level = val < 0 ? level : val;
+        log_info.level_run_time = val < 0 ? LOG_LEVEL_COMPILE_TIME : val;
     }
-    return runtime_level;
+    return log_info.level_run_time;
 }
 
 static void log_print(int level, const char* fmt, va_list ap) {
@@ -67,14 +75,10 @@ static void log_print(int level, const char* fmt, va_list ap) {
     }
     vfprintf(stderr, fmt, ap);
     fprintf(stderr, "\n");
-
-    if (level >= LOG_LEVEL_ERROR) {
-        abort();
-    }
 }
 
-void log_print_debug(int level, const char* fmt, ...) {
-    if (log_get_runtime_level(level) > LOG_LEVEL_DEBUG) {
+void log_print_debug(const char* fmt, ...) {
+    if (log_get_runtime_level() > LOG_LEVEL_DEBUG) {
         return;
     }
     va_list ap;
@@ -83,8 +87,8 @@ void log_print_debug(int level, const char* fmt, ...) {
     va_end(ap);
 }
 
-void log_print_info(int level, const char* fmt, ...) {
-    if (log_get_runtime_level(level) > LOG_LEVEL_INFO) {
+void log_print_info(const char* fmt, ...) {
+    if (log_get_runtime_level() > LOG_LEVEL_INFO) {
         return;
     }
     va_list ap;
@@ -93,8 +97,8 @@ void log_print_info(int level, const char* fmt, ...) {
     va_end(ap);
 }
 
-void log_print_warning(int level, const char* fmt, ...) {
-    if (log_get_runtime_level(level) > LOG_LEVEL_WARNING) {
+void log_print_warning(const char* fmt, ...) {
+    if (log_get_runtime_level() > LOG_LEVEL_WARNING) {
         return;
     }
     va_list ap;
@@ -103,12 +107,18 @@ void log_print_warning(int level, const char* fmt, ...) {
     va_end(ap);
 }
 
-void log_print_error(int level, const char* fmt, ...) {
-    if (log_get_runtime_level(level) > LOG_LEVEL_ERROR) {
+void log_print_error(const char* fmt, ...) {
+    if (log_get_runtime_level() > LOG_LEVEL_ERROR) {
         return;
     }
     va_list ap;
     va_start(ap, fmt);
     log_print(LOG_LEVEL_ERROR, fmt, ap);
     va_end(ap);
+
+    abort();
+}
+
+const LogInfo* log_get_info(void) {
+    return &log_info;
 }

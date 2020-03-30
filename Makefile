@@ -18,7 +18,7 @@ CFLAGS += -DMEM_CHECK=1
 # CFLAGS += -DMEM_USE_REALLOC_INSTEAD_OF_MALLOC_AND_FREE=1
 
 # see more log messages
-CFLAGS += -DLOG_LEVEL=1
+CFLAGS += -DLOG_LEVEL=0
 
 # turn on debugger support
 CFLAGS += -g
